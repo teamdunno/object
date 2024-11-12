@@ -4,6 +4,6 @@
     "lock": false,
     "license": "MIT",
     "exports":"./Object.ts",
-    "version":"1.0.0",
+    "version":"1.0.1",
     "publish": {"include": ["test.ts","Object.ts", "README.md", "LICENSE"]}
 }
