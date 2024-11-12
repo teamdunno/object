@@ -1,0 +1,8 @@
+{
+    "name": "@cupglassdev/obj",
+    "test": {"include": ["testInternal.ts"]},
+    "lock": false,
+    "license": "MIT",
+    "exports":"./Object.ts",
+    "publish": {"include": ["test.ts","Object.ts", "README", "LICENSE"]}
+}
