@@ -1,3 +1,5 @@
+## NOTE: Since i was joining teamdunno, USE THE @dunno/object INSTEAD
+
 # Object
 manipulating object? Nah, thats eazy!
 ## Installing 
