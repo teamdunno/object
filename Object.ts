@@ -1,4 +1,4 @@
-/*
+/**
  * Compare objects BY reference, can be any
  *
  * @param obj1 The first object that you want to compare
