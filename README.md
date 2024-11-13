@@ -1,4 +1,3 @@
-this package was originally made by [cupglassdev](https://github.com/cupglassDEV)
 # Object
 manipulating object? Nah, thats eazy!
 ## Installing 
