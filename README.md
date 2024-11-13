@@ -1,5 +1,7 @@
 # Object
 manipulating object? Nah, thats eazy!
+## Current changelog
+BREAKING CHANGE when migrating from @cupglassdev/object. `refCompare` was renamed to `compareRef`
 ## Installing 
 You can install this in Node! (Yes, without transpilling) By running
 ```shell
