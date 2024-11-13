@@ -66,7 +66,7 @@ import * as obj from "@dunno/object"
 const helloArray = ['Hello']
 /* 
 This is our reference two 
-(because it isnt re-forward reference one 
+(because it dosent re-forward reference one 
 like we do in the first example)
 */
 const hiArray = ['Hello']
