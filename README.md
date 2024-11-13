@@ -1,41 +1,39 @@
-## NOTE: Since i was joining teamdunno, USE THE @dunno/object INSTEAD
-
 # Object
 manipulating object? Nah, thats eazy!
 ## Installing 
 You can install this in Node! (Yes, without transpilling) By running
 ```shell
-$ npx jsr add @cupglassdev/object
+$ npx jsr add @dunno/object
 ```
 Or in Yarn
 ```shell
-$ yarn dlx jsr add @cupglassdev/object
+$ yarn dlx jsr add @dunno/object
 ```
 Or in pnpm
 ```shell
-$ pnpm dlx jsr add @cupglassdev/object
+$ pnpm dlx jsr add @dunno/object
 ```
 ---
 Or in Deno (they provide their built in JSR system, so just do this)
 ```shell
-$ deno add @cupglassdev/object
+$ deno add jsr:@dunno/object
 ```
 Or in Bun
 ```shell
-$ bunx jsr add @cupglassdev/object
+$ bunx jsr add @dunno/object
 ```
 ## Importing
 By default, the module dosent have a default export. You can do it like this
 ```js
-import * as obj from "@cupglassdev/object"
+import * as obj from "@dunno/object"
 ```
 Or for [Deno](https://deno.com) users
 ```js
-import * as obj from "jsr:@cupglassdev/object"
+import * as obj from "jsr:@dunno/object"
 ```
 ## (Deno only) Test for production
 This package is included with the [test.ts](./test.ts) file. If you want to run it, do these
-- Download the test file from our original repository https://github.com/cupglassDEV/object/blob/main/test.ts
+- Download the test file from our original repository [test.ts](./test.ts)
 - Run the deno Test command
 ```shell
 $ deno test /path/to/test.ts
@@ -45,16 +43,15 @@ $ deno test /path/to/test.ts
 However, Deno can exchange the test result into a report file. For example, JUnit, and other stuff
 https://docs.deno.com/runtime/fundamentals/testing/#reporters
 ## Contributing
-If you want to report a bug, or suggestion, make a new issue under our repository
-
-- New issue https://github.com/cupglassDEV/object/issues/new/choose
-- Contributing/pull request https://github.com/cupglassDEV/object/compare
+If you want to report a bug, or suggestion, make a new issue under our repository (see on the 'Links' section)
 ## License
 This package is licensed under MIT. You can see at [LICENSE](./LICENSE)
+## Links
+- Repository https://github.com/teamdunno/object
 ## Example
 #### Compare same non-primitive reference
 ```js
-import * as obj from "@cupglassdev/object"
+import * as obj from "@dunno/object"
 // This is our reference one
 const helloArray = ['Hello']
 // This variable just re-forwards the reference one
@@ -64,7 +61,7 @@ console.log(obj.refCompare(helloArray, hiArray))
 ```
 #### Compare diffrent non-primitive reference
 ```js
-import * as obj from "@cupglassdev/object"
+import * as obj from "@dunno/object"
 // This is our reference one
 const helloArray = ['Hello']
 /* 
@@ -81,7 +78,7 @@ console.log(obj.refCompare(helloArray, hiArray))
 ```
 #### Detect if array was a normal array
 ```js
-import * as obj from "@cupglassdev/object"
+import * as obj from "@dunno/object"
 // make a new, normal array
 const test = ["Hello"]
 /*
@@ -94,7 +91,7 @@ console.log(obj.isExtendedArray(test))
 ```
 #### Detect if array was an extended array class (Int16Array, or such)
 ```js
-import * as obj from "@cupglassdev/object"
+import * as obj from "@dunno/object"
 // make a new Int16Array
 const test = new Int16Array([8])
 // The output should be `false`
