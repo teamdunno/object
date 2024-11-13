@@ -48,7 +48,7 @@ const helloArray = ['Hello']
 // This variable just re-forwards the reference one
 const hiArray = helloArray
 // The output should be `true`
-console.log(obj.refCompare(helloArray, hiArray))
+console.log(obj.compareRef(helloArray, hiArray))
 ```
 #### Compare diffrent non-primitive reference
 ```js
@@ -65,7 +65,7 @@ const hiArray = ['Hello']
 The output should be `false`. 
 Even though the value are exactly same
 */
-console.log(obj.refCompare(helloArray, hiArray))
+console.log(obj.compareRef(helloArray, hiArray))
 ```
 #### Detect if array was a normal array
 ```js
