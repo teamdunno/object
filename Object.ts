@@ -4,7 +4,7 @@
  * @param obj1 The first object that you want to compare
  * @param obj2 The second object that you want to compare
  */
-export function refCompare<O1 extends unknown, O2 extends unknown>(
+export function compareRef<O1 extends unknown, O2 extends unknown>(
   obj1: O1,
   obj2: O2,
 ): boolean {
