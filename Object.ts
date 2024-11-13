@@ -1,4 +1,9 @@
-/** Compare objects BY reference, can be any */
+/** 
+  * Compare objects BY reference, can be any
+  * 
+  * @param obj1 The first object that you want to compare
+  * @param obj1 The second object that you want to compare
+  */
 export function refCompare<O1 extends unknown, O2 extends unknown>(obj1:O1, obj2:O2):boolean {
     if (typeof Object.is === "undefined") {
         // deno-lint-ignore ban-ts-comment
