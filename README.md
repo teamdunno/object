@@ -31,17 +31,6 @@ Or for [Deno](https://deno.com) users
 ```js
 import * as obj from "jsr:@dunno/object"
 ```
-## (Deno only) Test for production
-This package is included with the [test.ts](./test.ts) file. If you want to run it, do these
-- Download the test file from our original repository [test.ts](./test.ts)
-- Run the deno Test command
-```shell
-$ deno test /path/to/test.ts
-```
-- Then just see the result
-
-However, Deno can exchange the test result into a report file. For example, JUnit, and other stuff
-https://docs.deno.com/runtime/fundamentals/testing/#reporters
 ## Contributing
 If you want to report a bug, or suggestion, make a new issue under our repository (see on the 'Links' section)
 ## License
