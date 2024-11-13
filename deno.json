@@ -1,6 +1,6 @@
 {
-    "name": "@cupglassdev/object",
-    "test": {"include": ["testInternal.ts"]},
+    "name": "@dunno/object",
+    "test": {"include": ["test.ts"]},
     "lock": false,
     "license": "MIT",
     "exports":"./Object.ts",
