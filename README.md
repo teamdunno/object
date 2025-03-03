@@ -6,6 +6,7 @@ This includes type-checking at runtime, so when you compare these objects, you a
 
 ## Current changelog
 <details>
+
 - Added support for `null` as a placeholder to `undefined` (only `track()` dosent support it)
 - `realTypeof` was added to fix those annoying `typeof` limitation! So, instead of
   - Array
