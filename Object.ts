@@ -37,23 +37,6 @@ export function isNull<
 }
 
 /**
- * Check if object was empty, and aren't null
- *
- * @param obj The object that you want to check
- * @returns boolean
- */
-export function isEmptyObject<
-  Expected extends Record<string, unknown>,
-  Initial extends unknown,
->(obj: Initial): obj is Extended<Initial, Expected> {
-  const n = isNull(obj)
-  if (n) return false
-  if (typeof obj !== "object") return false;
-  if (Object.keys(obj as (Initial & object)).length < 1) return false;
-  return true
-}
-
-/**
  * Check if object passed was an array
  *
  * @param obj The object that you want to check
@@ -99,7 +82,6 @@ export function isLiteralArray<
   Expected extends Array<unknown>,
   Initial extends unknown,
 >(obj: Initial): obj is Extended<Initial, Expected> {
-  type Res = Extended<Initial, Expected>
   const res = isArray<Expected, Initial>(obj);
   if (!res) return false;
   return (obj instanceof Array);
@@ -115,6 +97,38 @@ export function isEmptyLiteralArray<
   Initial extends unknown
 >(obj: Initial): boolean {
   if (!isLiteralArray(obj)) return false
+  if (obj.length < 1) return false;
+  return true
+}
+
+/**
+ * Check if object was empty, and aren't null
+ *
+ * @param obj The object that you want to check
+ * @returns boolean
+ */
+export function isEmptyObject<
+  Expected extends Record<string, unknown>,
+  Initial extends unknown,
+>(obj: Initial): obj is Extended<Initial, Expected> {
+  const n = isNull(obj)
+  if (n) return false
+  if (typeof obj !== "object") return false;
+  if (Object.keys(obj as (Initial & object)).length < 1) return false;
+  return true
+}
+
+/**
+ * Check if string was empty
+ * 
+ * @param obj The object that you want to check
+ * @returns boolean
+ */
+export function isEmptyString<
+  Initial extends unknown
+>(obj: Initial): boolean {
+  if (isNull(obj)) return false;
+  if (typeof obj !== "string") return false;
   if (obj.length < 1) return false;
   return true
 }
@@ -234,6 +248,9 @@ export interface Track<Value, Max extends number|undefined=undefined> {
 }
 /**
  * Track object
+ * 
+ * ℹ️ **Note**: This function dosent uses {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy Proxy}.
+ * So, if you want to trigger changes (for object and array), use {@link newRef}
  * 
  * @param value The value
  * @param maxFn (Optional) Maximum event listeners. If the listener limit has exceeded by that argument, it would be silently discarded from {@link Track.watch} and {@link Track.observe} unless you clean it

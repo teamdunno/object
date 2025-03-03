@@ -6,8 +6,19 @@ This includes type-checking at runtime, so when you compare these objects, you a
 
 ## Current changelog
 
-BREAKING CHANGE when migrating from @cupglassdev/object. `refCompare` was
-renamed to `compareRef`
+- Added support for `null` as a placeholder to `undefined` (only `track()` dosent support it)
+- `realTypeof` was added to fix those annoying `typeof` limitation! So, instead of
+  - Array
+    - on normal `typeof`: `"object"`
+    - on `realTypeof`: `"array"`
+  - null
+    - on normal `typeof`: `"object"`
+    - on `realTypeof`: `"null"`
+  - Class
+    - on normal `typeof`: `"function"`
+    - on `realTypeof`: `"class"`
+- Trackers (`track()` and `Track` object) has been added to listen object changes
+- Detect empty objects (for `string`, `object`, and `array`) 
 
 ## Installing
 
