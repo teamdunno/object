@@ -5,7 +5,7 @@ manipulating object? Nah, thats eazy!
 This includes type-checking at runtime, so when you compare these objects, you are very VERY safe!
 
 ## Current changelog
-
+<details>
 - Added support for `null` as a placeholder to `undefined` (only `track()` dosent support it)
 - `realTypeof` was added to fix those annoying `typeof` limitation! So, instead of
   - Array
@@ -19,6 +19,7 @@ This includes type-checking at runtime, so when you compare these objects, you a
     - on `realTypeof`: `"class"`
 - Trackers (`track()` and `Track` object) has been added to listen object changes
 - Detect empty objects (for `string`, `object`, and `array`) 
+</details>
 
 ## Installing
 
