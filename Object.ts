@@ -114,8 +114,8 @@ export function isEmptyObject<
   const n = isNull(obj)
   if (n) return false
   if (typeof obj !== "object") return false;
-  if (Object.keys(obj as (Initial & object)).length < 1) return false;
-  return true
+  if (Object.keys(obj as (Initial & object)).length < 1) return true;
+  return false
 }
 
 /**
@@ -129,8 +129,8 @@ export function isEmptyString<
 >(obj: Initial): boolean {
   if (isNull(obj)) return false;
   if (typeof obj !== "string") return false;
-  if (obj.length < 1) return false;
-  return true
+  if (obj.length < 1) return true;
+  return false
 }
 
 /**
@@ -146,8 +146,8 @@ export function isEmptyArray<
   Initial extends unknown
 >(obj: Initial): boolean {
   if (!isArray(obj)) return false
-  if (obj.length < 1) return false;
-  return true
+  if (obj.length < 1) return true;
+  return false
 }
 
 /**
@@ -160,8 +160,8 @@ export function isEmptyExtendedArray<
   Initial extends unknown
 >(obj: Initial): boolean {
   if (!isExtendedArray(obj)) return false
-  if (obj.length < 1) return false;
-  return true
+  if (obj.length < 1) return true;
+  return false
 }
 
 /**
