@@ -3,7 +3,10 @@
     "test": {"include": ["test.ts"]},
     "lock": false,
     "license": "MIT",
-    "exports":"./Object.ts",
+    "exports":{
+       ".":"./Object.ts",
+       "./test":"./test.ts"
+    },
     "version":"1.2.0-pre",
     "publish": {"include": ["test.ts","Object.ts", "README.md", "LICENSE"]}
 }

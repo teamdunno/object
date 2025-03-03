@@ -418,7 +418,7 @@ export function isFunction<
   // class is actually a function, since js picks up the constructor
   if (typeof obj !== "function") return false;
   const propertyNames = Object.getOwnPropertyNames(obj);
-  return (propertyNames.includes('arguments') && !propertyNames.includes('prototype'));
+  return !propertyNames.includes('prototype');
 }
 
 
@@ -436,7 +436,7 @@ export function isClass<
   // class is actually a function, since js picks up the constructor
   if (typeof obj !== "function") return false;
   const propertyNames = Object.getOwnPropertyNames(obj);
-  return (propertyNames.includes('prototype') && !propertyNames.includes('arguments'));
+  return propertyNames.includes('prototype');
 }
 
 /**
