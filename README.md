@@ -24,7 +24,7 @@ This includes type-checking at runtime, so when you compare these objects, you a
 
 ## Installing
 
-You can install this in Node! (Yes, without transpilling) By running
+You can install this in Node! (Yes, without transpiling manually) By running
 
 ```shell
 $ npx jsr add @dunno/object
