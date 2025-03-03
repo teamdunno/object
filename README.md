@@ -7,20 +7,15 @@ This includes type-checking at runtime, so when you compare these objects, you a
 ## Current changelog
 <details>
 
-- Bugfix for `isEmpty` functions
-- Added support for `null` as a placeholder to `undefined` (only `track()` dosent support it)
-- `realTypeof` was added to fix those annoying `typeof` limitation! So, instead of
-  - Array
-    - on normal `typeof`: `"object"`
-    - on `realTypeof`: `"array"`
-  - null
-    - on normal `typeof`: `"object"`
-    - on `realTypeof`: `"null"`
-  - Class
-    - on normal `typeof`: `"function"`
-    - on `realTypeof`: `"class"`
-- Trackers (`track()` and `Track` object) has been added to listen object changes
-- Detect empty objects (for `string`, `object`, and `array`) 
+- Bugfix for `isEmptyLiteralArray` function
+- Fix typo for `isEmptyExtendedArray` function
+- Add async array & synced array functions (to detect those `Symbol.iterator` and `Symbol.asyncIterator`). 
+> But if `Symbol.asyncIterator` dosent supported, it will return as `false` from `isAsyncArray` and other async array functions
+- Added a clause for `string` in `isArray`, since `string` can be iterated too with characters
+- Also added detection for `Symbol.asyncIterator` for `isArray`
+- Added `isFunction` and `isObjectEmpty` (different than `isEmptyObject`)
+- Type `Extended` has been made public!
+
 </details>
 
 ## Installing
@@ -74,7 +69,7 @@ import * as obj from "jsr:@dunno/object";
 ## Contributing
 
 If you want to report a bug, or suggestion, make a new issue under our
-repository (see on the 'Links' section)
+repository (see [Links](#links))
 
 ## License
 
@@ -83,8 +78,12 @@ This package is licensed under MIT. You can see at [LICENSE](./LICENSE)
 ## Links
 
 - Repository https://github.com/teamdunno/object
+- JSR page https://jsr.io/@dunno/object
+- Live Playground: https://dash.deno.com/playground/dunno-object-example
 
 ## Example
+
+You can also see our live playground (see [Links](#links))
 
 #### Compare same non-primitive reference
 
