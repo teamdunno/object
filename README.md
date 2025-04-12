@@ -7,14 +7,8 @@ This includes type-checking at runtime, so when you compare these objects, you a
 ## Current changelog
 <details>
 
-- Bugfix for `isEmptyLiteralArray` function
-- Fix typo for `isEmptyExtendedArray` function
-- Add async array & synced array functions (to detect those `Symbol.iterator` and `Symbol.asyncIterator`). 
-> But if `Symbol.asyncIterator` dosent supported, it will return as `false` from `isAsyncArray` and other async array functions
-- Added a clause for `string` in `isArray`, since `string` can be iterated too with characters
-- Also added detection for `Symbol.asyncIterator` for `isArray`
-- Added `isFunction` and `isObjectEmpty` (different than `isEmptyObject`)
-- Type `Extended` has been made public!
+- Added `utilInit` so you can access `<object>.check()`, `<object>.checkAsync()`, `<object>.into()`, `<object>.intoAsync()`
+- Added `<object>.compareRef()`
 
 </details>
 

@@ -1,3 +1,113 @@
+export type FnOpt2<ReturnType> = (...args: unknown[]) => ReturnType
+export type AnyFnOpts2 = FnOpt2<boolean>;
+export type AnyAsyncFnOpts2 = FnOpt2<Promise<boolean>>;
+export type FnOpt1<T, ReturnType> = (value:T, ...args: unknown[]) => ReturnType
+export type AnyFnOpts1<T> = FnOpt1<T, boolean>;
+export type AnyAsyncFnOpts1<T> = FnOpt1<T, Promise<boolean>>;
+declare global {
+  interface Object {
+    /**
+     * ⚠️ Needs to run {@link utilInit} to make the function added
+     * 
+     * Check if value was true or dosent containts error while parsing the object.
+     * 
+     * @param fn The function to asert
+     * 
+     * @returns `this` value
+     */
+    check<T extends unknown, ReturnType = T>(this:T, fn: AnyFnOpts1<T>): ReturnType;
+    check<T extends unknown, ReturnType = T>(this:T, fn: AnyFnOpts2): ReturnType;
+
+    /**
+     * ⚠️ Needs to run {@link utilInit} to make the function added
+     * 
+     * Check if value was true or dosent containts error while parsing the object. 
+     * Supports `Promise`
+     * 
+     * @param fn The function to asert
+     * 
+     * @returns `this` value
+     */
+    checkAsync<T extends unknown, ReturnType = T>(this:T, fn: AnyAsyncFnOpts1<T>): ReturnType;
+    checkAsync<T extends unknown, ReturnType = T>(this:T, fn: AnyAsyncFnOpts2): ReturnType;
+
+    /**
+     * ⚠️ Needs to run {@link utilInit} to make the function added
+     * 
+     * Make the type Into provided function that converts to desired object
+     * 
+     * @param fn The function to convert
+     * 
+     * @returns returned value from fn parameter
+     */
+    into<ReturnType, T extends unknown>(this:T, fn:FnOpt2<ReturnType>): ReturnType;
+
+    /**
+     * ⚠️ Needs to run {@link utilInit} to make the function added
+     * 
+     * Make the type Into provided async function that converts to desired object. `Promise` is supported
+     * 
+     * @param fn The function to convert
+     * 
+     * @returns returned value from fn parameter
+     */
+    intoAsync<ReturnType, T extends unknown>(this:T, fn:FnOpt2<Promise<ReturnType>>): Promise<ReturnType>;
+    /**
+     * Compare objects BY reference, can be any
+     *
+     * @param obj The object that you want to compare
+     */
+    compareRef<O, T extends unknown>(this:T, obj:O): boolean;
+}
+}
+Object.prototype.compareRef = function (o) {
+  return compareRef(this, o)
+}
+/**
+ * Initialize functions to help type checking with the objects
+ * 
+ * @param errorHook The error hook if the type checking was wrong/failed. The function **should** return error, not throwing it
+ */
+export const utilInit = (errorHook?:((error:unknown)=>unknown))=>{
+  const hook = errorHook?errorHook:(e:unknown)=>{return TypeError("Incorrect type: "+e)}
+  Object.prototype.check = function (fn) {
+    try {
+      const v = fn(this)
+      if (typeof v === "boolean" && v) {
+        return this
+      }
+    } catch(e) {
+      throw hook(e)
+    }
+  }
+  Object.prototype.checkAsync = async function (fn) {
+    try {
+      const v = await fn(this)
+      if (typeof v === "boolean" && v) {
+        return this
+      }
+    } catch(e) {
+      throw hook(e)
+    }
+  }
+  Object.prototype.into = function (fn) {
+    try {
+      return fn(this)
+    } catch(e) {
+      throw hook(e)
+    }
+  }
+  Object.prototype.intoAsync = async function (fn) {
+    try {
+      return await fn(this)
+    } catch(e) {
+      throw hook(e)
+    }
+  }
+}
+/** WIP: Clause chains to work on {@link utilInit}. Currently not documented very well */
+export const clauseChain = {
+}
 /**
  * Compare objects BY reference, can be any
  *
@@ -167,7 +277,7 @@ export function isAsyncArray<
   // or typeof Object(obj)[Symbol.iterator] === 'function'
   if (typeof Symbol.asyncIterator !== "undefined") {
     return Symbol.asyncIterator in Object(obj)
-  } 
+  }
   return false;
 }
 
@@ -470,7 +580,7 @@ export function newRef<T>(obj: T): T {
   return prim as T;
 }
 /** Track object */
-export interface Track<Value, Max extends number | undefined = undefined> {
+export interface Track<Value> {
   /** The value */
   value: Value
   /** 
@@ -496,7 +606,7 @@ export interface Track<Value, Max extends number | undefined = undefined> {
   */
   hasFn(fn: (val: Value) => void): boolean
   /** Max event listeners. Can be `undefined` if dosen't set */
-  maxFn?: Max
+  maxFn?: number
   /** 
    * Remove function by reference
    * 
@@ -516,7 +626,7 @@ export interface Track<Value, Max extends number | undefined = undefined> {
  * @param maxFn (Optional) Maximum event listeners. If the listener limit has exceeded by that argument, it would be silently discarded from {@link Track.watch} and {@link Track.observe} unless you clean it
  * @returns => {@link Track} object
  */
-export function track<T extends unknown, Max extends number | undefined>(value: T, maxFn?: Max): Track<T, Max> {
+export function track<T extends unknown>(value: T, maxFn?: number): Track<T> {
   let _listOfEvs: ((val: T) => void)[] = []
   let v = value
   return {

@@ -7,6 +7,6 @@
        ".":"./Object.ts",
        "./test":"./test.ts"
     },
-    "version":"1.2.0",
+    "version":"1.2.1",
     "publish": {"include": ["test.ts","Object.ts", "README.md", "LICENSE"]}
 }
