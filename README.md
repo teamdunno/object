@@ -4,6 +4,8 @@ manipulating object? Nah, thats eazy!
 
 This includes type-checking at runtime, so when you compare these objects, you are very VERY safe!
 
+Unlike `Valibot`, `Zod` and others, this only checks types at JS. Some functions are supported to return as full Typescript types
+
 ## Current changelog
 <details>
 
