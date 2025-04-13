@@ -10,11 +10,20 @@ Unlike `Valibot`, `Zod` and others, this only checks types at JS. Some functions
 <details>
 
 - Added `SeeMaker` class for typechecking at JS, including;
-- Addded function `SeeMaker.see` or default `see` function, so you can access `<object>.check()`, `<object>.checkAsync()`, `<object>.into()`, `<object>.intoAsync()`
+- Addded function `SeeMaker.see()` or default `see()` function, so you can access `.check()`, `.checkAsync()`, `.into()`, `.intoAsync()`
 - Added `typer` to work on typechecking at JS
-- Added `withTyper` for `typer` wrapper for `SeeMaker.see` 
+- Added `withTyper` for `typer` wrapper for `SeeMaker.see()` 
 
 </details>
+
+## Downloading from CDN
+
+You can do that by checking the main branch of `Object.js`, and get the raw link
+
+https://raw.githubusercontent.com/teamdunno/object/refs/heads/main/Object.js
+
+or just download the release and get the `Object.js` file
+
 
 ## Installing
 
