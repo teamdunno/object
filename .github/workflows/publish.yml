@@ -1,5 +1,6 @@
 name: Publish
 on:
+  workflow_dispatch:
   release:
     branches:
       - main
