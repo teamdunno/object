@@ -7,8 +7,10 @@ This includes type-checking at runtime, so when you compare these objects, you a
 ## Current changelog
 <details>
 
-- Added `utilInit` so you can access `<object>.check()`, `<object>.checkAsync()`, `<object>.into()`, `<object>.intoAsync()`
-- Added `<object>.compareRef()`
+- Added `SeeMaker` class for typechecking at JS, including;
+- Addded function `SeeMaker.see` or default `see` function, so you can access `<object>.check()`, `<object>.checkAsync()`, `<object>.into()`, `<object>.intoAsync()`
+- Added `typer` to work on typechecking at JS
+- Added `withTyper` for `typer` wrapper for `SeeMaker.see` 
 
 </details>
 

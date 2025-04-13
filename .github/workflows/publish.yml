@@ -6,14 +6,23 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      id-token: write
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Publish package
-        run: npx jsr publish
+   runs-on: ubuntu-latest 
+   permissions:
+     contents: write
+     id-token: write 
+   steps:
+     - uses: actions/checkout@v4
+     
+     - uses: denoland/setup-deno@v2
+       with:
+         deno-version: v2.x 
+     - name: Generate emitted javascript file
+       run: deno run --allow-env --allow-read --allow-write --allow-net ./distBuilder.ts
+     - name: Commit to github
+       run: |
+         git config --global user.name "Elemxx bot"
+         git config --global user.email "ghost@action.noreply.github.com"
+         git commit -a -m "Transpile typescript files"
+         git push
+     - name: Publish package
+       run: deno publish

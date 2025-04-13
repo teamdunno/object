@@ -1,112 +1,271 @@
-export type FnOpt2<ReturnType> = (...args: unknown[]) => ReturnType
-export type AnyFnOpts2 = FnOpt2<boolean>;
-export type AnyAsyncFnOpts2 = FnOpt2<Promise<boolean>>;
-export type FnOpt1<T, ReturnType> = (value:T, ...args: unknown[]) => ReturnType
+class ParserError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ParserError";
+  }
+}
+export type FnOpt2<T, ReturnType> = (value: T) => ReturnType
+export type AnyFnOpts2<T> = FnOpt2<T, boolean>;
+export type AnyAsyncFnOpts2<T> = FnOpt2<T, Promise<boolean>>;
+export type FnOpt1<T, ReturnType> = (value: T) => ReturnType
 export type AnyFnOpts1<T> = FnOpt1<T, boolean>;
 export type AnyAsyncFnOpts1<T> = FnOpt1<T, Promise<boolean>>;
-declare global {
-  interface Object {
-    /**
-     * ⚠️ Needs to run {@link utilInit} to make the function added
-     * 
-     * Check if value was true or dosent containts error while parsing the object.
-     * 
-     * @param fn The function to asert
-     * 
-     * @returns `this` value
-     */
-    check<T extends unknown, ReturnType = T>(this:T, fn: AnyFnOpts1<T>): ReturnType;
-    check<T extends unknown, ReturnType = T>(this:T, fn: AnyFnOpts2): ReturnType;
+/** "See" objects and check it */
+export interface See<T extends unknown = unknown> {
+  /**
+   * Check if value was true or dosent containts error while parsing the object
+   * 
+   * @param fn The function to asert
+   * 
+   * @returns `this` value
+   */
+  check<ReturnType = See<T>>(fn: AnyFnOpts1<T>): ReturnType;
+  check<ReturnType = See<T>>(fn: AnyFnOpts2<T>): ReturnType;
 
-    /**
-     * ⚠️ Needs to run {@link utilInit} to make the function added
-     * 
-     * Check if value was true or dosent containts error while parsing the object. 
-     * Supports `Promise`
-     * 
-     * @param fn The function to asert
-     * 
-     * @returns `this` value
-     */
-    checkAsync<T extends unknown, ReturnType = T>(this:T, fn: AnyAsyncFnOpts1<T>): ReturnType;
-    checkAsync<T extends unknown, ReturnType = T>(this:T, fn: AnyAsyncFnOpts2): ReturnType;
+  /**
+   * Check if value was true or dosent containts error while parsing the object. 
+   * Supports `Promise`
+   * 
+   * @param fn The function to asert
+   * 
+   * @returns `this` value
+   */
+  checkAsync<ReturnType = See<T>>(fn: AnyAsyncFnOpts1<T>): ReturnType;
+  checkAsync<ReturnType = See<T>>(fn: AnyAsyncFnOpts2<T>): ReturnType;
 
-    /**
-     * ⚠️ Needs to run {@link utilInit} to make the function added
-     * 
-     * Make the type Into provided function that converts to desired object
-     * 
-     * @param fn The function to convert
-     * 
-     * @returns returned value from fn parameter
-     */
-    into<ReturnType, T extends unknown>(this:T, fn:FnOpt2<ReturnType>): ReturnType;
+  /**
+   * Make the type Into provided function that converts to desired object
+   * 
+   * @param fn The function to convert
+   * 
+   * @returns returned value from fn parameter
+   */
+  into<ReturnType>(fn: FnOpt2<T, ReturnType>): See<ReturnType>;
 
-    /**
-     * ⚠️ Needs to run {@link utilInit} to make the function added
-     * 
-     * Make the type Into provided async function that converts to desired object. `Promise` is supported
-     * 
-     * @param fn The function to convert
-     * 
-     * @returns returned value from fn parameter
-     */
-    intoAsync<ReturnType, T extends unknown>(this:T, fn:FnOpt2<Promise<ReturnType>>): Promise<ReturnType>;
-    /**
-     * Compare objects BY reference, can be any
-     *
-     * @param obj The object that you want to compare
-     */
-    compareRef<O, T extends unknown>(this:T, obj:O): boolean;
+  /**
+   * Make the type Into provided async function that converts to desired object. `Promise` is supported
+   * 
+   * @param fn The function to convert
+   * 
+   * @returns returned value from fn parameter
+   */
+  intoAsync<ReturnType>(fn: FnOpt2<T, Promise<ReturnType>>): Promise<See<ReturnType>>;
+  /** Return to the chained object's value */
+  raw(): T;
 }
+export class SeeMaker {
+  /**
+   * Make a {@link SeeMaker}
+   * 
+   * @param errorHook The error hook when the parsing at {@link SeeMaker.see} failed
+   */
+  constructor(errorHook?:((error: unknown) => unknown)) {
+    this.errorHook = errorHook?errorHook:(v)=>{
+      if (v instanceof ParserError) {
+        throw v
+      }
+      throw TypeError("Incorrect type: "+v)
+    };
+  }
+  errorHook: ((error: unknown) => unknown);
+  /**
+   * See objects and check it
+   * 
+   * @param value The value
+   * 
+   * @returns => "{@link See}" object
+   */
+  see<T extends unknown = unknown>(value: T): See<T> {
+    const errorHook = this.errorHook
+    return {
+      check: function (fn) {
+        try {
+          const v = fn(value);
+          if (typeof v === "boolean" && v) {
+            return value;
+          }
+        } catch (e) {
+          if (errorHook) errorHook(e)
+          throw undefined
+        }
+      },
+      checkAsync: async function (fn) {
+        try {
+          const v = await fn(value)
+          if (typeof v === "boolean" && v) {
+            return value
+          }
+        } catch (e) {
+          if (errorHook) errorHook(e)
+          // to trick the ide, even tho its always throwed at errorHook
+          throw undefined
+        }
+      },
+      into: function (fn) {
+        try {
+          return see(fn(value))
+        } catch (e) {
+          if (errorHook) errorHook(e)
+          throw undefined
+        }
+      },
+      intoAsync: async function (fn) {
+        try {
+          return see(await fn(value))
+        } catch (e) {
+          if (errorHook) errorHook(e)
+          throw undefined
+        }
+      },
+      raw: function () {
+        return value
+      }
+    }
+  }
 }
-Object.prototype.compareRef = function (o) {
-  return compareRef(this, o)
-}
-/**
- * Initialize functions to help type checking with the objects
+
+/** A wrapper for `(new SeeMaker()).see` with default error handling */
+export const see = (new SeeMaker()).see
+
+// export type Predicate<T> = (value: unknown) => value is T;
+// type Infer<T> = T extends Predicate<infer U> ? U : never;
+
+/** Type checker for objects. Dosen't provide "real" type (like Schema on Zod, Valibot, etc) */
+export const typer = {
+  enum: <T extends readonly string[]>(...values: T) => {
+    return ((val: unknown): ParserError | undefined => {
+      if (typeof val !== "string" || !values.includes(val as T[number])) {
+        return new ParserError(`Value is not a valid enum: ${val}`);
+      }
+      return undefined; // Success
+    });
+  },
+
+  tuple: (...types: ((v: unknown) => (ParserError | undefined))[]) => {
+    return ((val: unknown): ParserError | undefined => {
+      if (!Array.isArray(val)) {
+        return new ParserError("Value is not an array");
+      }
+      if (val.length !== types.length) {
+        return new ParserError(`Array length mismatch: expected ${types.length}, got ${val.length}`);
+      }
+      for (let i = 0; i < val.length; i++) {
+        const result = types[i](val[i]);
+        if (result instanceof ParserError) {
+          return result; // Return the first error encountered
+        }
+      }
+      return undefined; // Success
+    });
+  },
+
+  string: () => {
+    return ((val: unknown): ParserError | undefined => {
+      if (typeof val !== "string") {
+        return new ParserError(`Expected string, but got ${realTypeof(val)}`);
+      }
+      return undefined; // Success
+    });
+  },
+
+  number: () => {
+    return ((val: unknown): ParserError | undefined => {
+      if (typeof val !== "number") {
+        return new ParserError(`Expected number, but got ${realTypeof(val)}`);
+      }
+      return undefined; // Success
+    });
+  },
+
+  optional: (pred: (v: unknown) => (ParserError | undefined)) => {
+    return ((val: unknown): ParserError | undefined => {
+      if (val === undefined) {
+        return undefined; // Success
+      }
+      const result = pred(val);
+      if (result instanceof ParserError) {
+        return result; // Return the error if validation fails
+      }
+      return undefined; // Success
+    });
+  },
+
+  object: <T extends Record<string, (v: unknown) => (ParserError | undefined)>>(shape: T) => {
+    return ((val: unknown): ParserError | undefined => {
+      if (typeof val !== "object" || val === null) {
+        return new ParserError("Expected object, but got " + typeof val);
+      }
+      for (const key of Object.keys(shape) as (keyof T)[]) {
+        // deno-lint-ignore no-explicit-any
+        const validationResult = shape[key]((val as any)[key]);
+        if (validationResult instanceof ParserError) {
+          return validationResult; // Return the first error encountered
+        }
+      }
+      return undefined; // Success
+    });
+  },
+
+  record: (keyType: (v: unknown) => (ParserError | undefined), valueType: (v: unknown) => (ParserError | undefined)) => {
+    return ((val: unknown): ParserError | undefined => {
+      if (typeof val !== "object" || val === null) {
+        return new ParserError("Expected object, but got " + typeof val);
+      }
+      for (const key in val) {
+        const keyResult = keyType(key);
+        if (keyResult instanceof ParserError) {
+          return keyResult; // Return the error if key validation fails
+        }
+        // deno-lint-ignore no-explicit-any
+        const valueResult = valueType((val as any)[key]);
+        if (valueResult instanceof ParserError) {
+          return valueResult; // Return the error if value validation fails
+        }
+      }
+      return undefined; // Success
+    });
+  },
+
+  or: (...preds: ((v: unknown) => (ParserError | undefined))[]) => {
+    return ((val: unknown): ParserError | undefined => {
+      for (const pred of preds) {
+        const result = pred(val);
+        if (result === undefined) {
+          return undefined; // Success on first successful predicate
+        }
+      }
+      return new ParserError(`Value does not match any of the predicates`); // No match found
+    });
+  },
+
+  and: (...preds: ((v: unknown) => (ParserError | undefined))[]) => {
+    return ((val: unknown): ParserError | undefined => {
+      for (const pred of preds) {
+        const result = pred(val);
+        if (result instanceof ParserError) {
+          return result; // Return the first error encountered
+        }
+      }
+      return undefined; // Success
+    });
+  },
+};
+/** 
+ * A {@link typer} wrapper for "{@link SeeMaker.see}" function 
  * 
- * @param errorHook The error hook if the type checking was wrong/failed. The function **should** return error, not throwing it
- */
-export const utilInit = (errorHook?:((error:unknown)=>unknown))=>{
-  const hook = errorHook?errorHook:(e:unknown)=>{return TypeError("Incorrect type: "+e)}
-  Object.prototype.check = function (fn) {
-    try {
-      const v = fn(this)
-      if (typeof v === "boolean" && v) {
-        return this
-      }
-    } catch(e) {
-      throw hook(e)
-    }
+ * This function may "fakes" the value, since it always returns true. Or else just throw the returned {@link ParseError}
+ * 
+ * (also, {@link See.check} can handle errors)
+ * 
+ * @param fn The typer function
+ * 
+ * @returns => {@link See.check} compatible function
+*/
+export function withTyper(fn: ((v: unknown) => (ParserError | undefined))): (v: unknown) => boolean {
+  return (v) => {
+    fn(v)
+    return true;
   }
-  Object.prototype.checkAsync = async function (fn) {
-    try {
-      const v = await fn(this)
-      if (typeof v === "boolean" && v) {
-        return this
-      }
-    } catch(e) {
-      throw hook(e)
-    }
-  }
-  Object.prototype.into = function (fn) {
-    try {
-      return fn(this)
-    } catch(e) {
-      throw hook(e)
-    }
-  }
-  Object.prototype.intoAsync = async function (fn) {
-    try {
-      return await fn(this)
-    } catch(e) {
-      throw hook(e)
-    }
-  }
-}
-/** WIP: Clause chains to work on {@link utilInit}. Currently not documented very well */
-export const clauseChain = {
 }
 /**
  * Compare objects BY reference, can be any
