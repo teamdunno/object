@@ -123,7 +123,7 @@ export class SeeMaker {
     }
   }
 }
-
+// oh god
 /** A wrapper for `(new SeeMaker()).see` with default error handling */
 export const see:<T extends unknown = unknown>(value: T)=>See<T> = (new SeeMaker()).see
 
