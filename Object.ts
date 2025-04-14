@@ -19,8 +19,8 @@ export interface See<T extends unknown = unknown> {
    * 
    * @returns `this` value
    */
-  check<ReturnType = See<T>>(fn: AnyFnOpts1<T>): ReturnType;
-  check<ReturnType = See<T>>(fn: AnyFnOpts2<T>): ReturnType;
+  check<ReturnType = T>(fn: AnyFnOpts1<T>): See<ReturnType>;
+  check<ReturnType = T>(fn: AnyFnOpts2<T>): See<ReturnType>;
 
   /**
    * Check if value was true or dosent containts error while parsing the object. 
@@ -30,8 +30,8 @@ export interface See<T extends unknown = unknown> {
    * 
    * @returns `this` value
    */
-  checkAsync<ReturnType = See<T>>(fn: AnyAsyncFnOpts1<T>): ReturnType;
-  checkAsync<ReturnType = See<T>>(fn: AnyAsyncFnOpts2<T>): ReturnType;
+  checkAsync<ReturnType = T>(fn: AnyAsyncFnOpts1<T>): Promise<See<ReturnType>>;
+  checkAsync<ReturnType = T>(fn: AnyAsyncFnOpts2<T>): Promise<See<ReturnType>>;
 
   /**
    * Make the type Into provided function that converts to desired object
@@ -77,29 +77,33 @@ export class SeeMaker {
    */
   see<T extends unknown = unknown>(value: T): See<T> {
     const errorHook = this.errorHook
+    const see = this.see
     return {
       check: function (fn) {
+        let e; 
         try {
           const v = fn(value);
           if (typeof v === "boolean" && v) {
-            return value;
+            return see(value);
           }
-        } catch (e) {
-          if (errorHook) errorHook(e)
-          throw undefined
+        } catch (err) {
+          e=err
         }
+        errorHook(e)
+        throw undefined
       },
       checkAsync: async function (fn) {
+        let e; 
         try {
-          const v = await fn(value)
+          const v = await fn(value);
           if (typeof v === "boolean" && v) {
-            return value
+            return see(value);
           }
-        } catch (e) {
-          if (errorHook) errorHook(e)
-          // to trick the ide, even tho its always throwed at errorHook
-          throw undefined
+        } catch (err) {
+          e=err
         }
+        errorHook(e)
+        throw undefined
       },
       into: function (fn) {
         try {
@@ -123,16 +127,16 @@ export class SeeMaker {
     }
   }
 }
-// oh god
+
 /** A wrapper for `(new SeeMaker()).see` with default error handling */
 export const see:<T extends unknown = unknown>(value: T)=>See<T> = (new SeeMaker()).see
-
+export type TyperFunc = ((val: unknown)=>ParserError | undefined)
 // export type Predicate<T> = (value: unknown) => value is T;
 // type Infer<T> = T extends Predicate<infer U> ? U : never;
 
 /** Type checker for objects. Dosen't provide "real" type (like Schema on Zod, Valibot, etc) */
 export const typer = {
-  enum: <T extends readonly string[]>(...values: T) => {
+  enum: <T extends readonly string[]>(...values: T):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (typeof val !== "string" || !values.includes(val as T[number])) {
         return new ParserError(`Value is not a valid enum: ${val}`);
@@ -141,7 +145,7 @@ export const typer = {
     });
   },
 
-  tuple: (...types: ((v: unknown) => (ParserError | undefined))[]) => {
+  tuple: (...types: TyperFunc[]):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (!Array.isArray(val)) {
         return new ParserError("Value is not an array");
@@ -159,7 +163,7 @@ export const typer = {
     });
   },
 
-  string: () => {
+  string: ():TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (typeof val !== "string") {
         return new ParserError(`Expected string, but got ${realTypeof(val)}`);
@@ -168,7 +172,7 @@ export const typer = {
     });
   },
 
-  number: () => {
+  number: ():TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (typeof val !== "number") {
         return new ParserError(`Expected number, but got ${realTypeof(val)}`);
@@ -177,7 +181,7 @@ export const typer = {
     });
   },
 
-  optional: (pred: (v: unknown) => (ParserError | undefined)) => {
+  optional: (pred: TyperFunc):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (val === undefined) {
         return undefined; // Success
@@ -190,7 +194,7 @@ export const typer = {
     });
   },
 
-  object: <T extends Record<string, (v: unknown) => (ParserError | undefined)>>(shape: T) => {
+  object: <T extends Record<string, TyperFunc>>(shape: T):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (typeof val !== "object" || val === null) {
         return new ParserError("Expected object, but got " + typeof val);
@@ -206,7 +210,7 @@ export const typer = {
     });
   },
 
-  record: (keyType: (v: unknown) => (ParserError | undefined), valueType: (v: unknown) => (ParserError | undefined)) => {
+  record: (keyType: TyperFunc, valueType: TyperFunc):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (typeof val !== "object" || val === null) {
         return new ParserError("Expected object, but got " + typeof val);
@@ -226,7 +230,7 @@ export const typer = {
     });
   },
 
-  or: (...preds: ((v: unknown) => (ParserError | undefined))[]) => {
+  or: (...preds: TyperFunc[]):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       for (const pred of preds) {
         const result = pred(val);
@@ -238,7 +242,7 @@ export const typer = {
     });
   },
 
-  and: (...preds: ((v: unknown) => (ParserError | undefined))[]) => {
+  and: (...preds: TyperFunc[]):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       for (const pred of preds) {
         const result = pred(val);
@@ -249,6 +253,27 @@ export const typer = {
       return undefined; // Success
     });
   },
+  check(fn:(v:unknown)=>boolean):TyperFunc {
+    return (value):ParserError|undefined => {
+    let e:unknown = undefined; 
+    try {
+      const v = fn(value);
+      if (typeof v === "boolean" && v) {
+        return undefined;
+      }
+    } catch (err) {
+      e=err
+    }
+    if (e) {
+      if (e instanceof ParserError) {
+        return e;
+      } else {
+        return new ParserError("Failed to check type: "+e); 
+      }
+    }
+    return new ParserError("Failed to check type");
+  }
+}
 };
 /** 
  * A {@link typer} wrapper for "{@link SeeMaker.see}" function 
@@ -286,7 +311,6 @@ export function compareRef<O1 extends unknown, O2 extends unknown>(
 }
 /** Is type extended? */
 export type Extended<Initial, Expected> = Initial extends Expected ? Initial : never
-
 /**
  * Check if object was either `null` or `undefined`
  *
