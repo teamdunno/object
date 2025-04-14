@@ -72,6 +72,7 @@ export class SeeMaker {
     };
   }
 }
+// oh god
 /** A wrapper for `(new SeeMaker()).see` with default error handling */ export const see = new SeeMaker().see;
 // export type Predicate<T> = (value: unknown) => value is T;
 // type Infer<T> = T extends Predicate<infer U> ? U : never;
