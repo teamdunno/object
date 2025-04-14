@@ -26,29 +26,33 @@ export class SeeMaker {
    * @returns => "{@link See}" object
    */ see(value) {
     const errorHook = this.errorHook;
+    const see = this.see;
     return {
       check: function(fn) {
+        let e;
         try {
           const v = fn(value);
           if (typeof v === "boolean" && v) {
-            return value;
+            return see(value);
           }
-        } catch (e) {
-          if (errorHook) errorHook(e);
-          throw undefined;
+        } catch (err) {
+          e = err;
         }
+        errorHook(e);
+        throw undefined;
       },
       checkAsync: async function(fn) {
+        let e;
         try {
           const v = await fn(value);
           if (typeof v === "boolean" && v) {
-            return value;
+            return see(value);
           }
-        } catch (e) {
-          if (errorHook) errorHook(e);
-          // to trick the ide, even tho its always throwed at errorHook
-          throw undefined;
+        } catch (err) {
+          e = err;
         }
+        errorHook(e);
+        throw undefined;
       },
       into: function(fn) {
         try {
@@ -72,7 +76,6 @@ export class SeeMaker {
     };
   }
 }
-// oh god
 /** A wrapper for `(new SeeMaker()).see` with default error handling */ export const see = new SeeMaker().see;
 // export type Predicate<T> = (value: unknown) => value is T;
 // type Infer<T> = T extends Predicate<infer U> ? U : never;
@@ -184,6 +187,27 @@ export class SeeMaker {
         }
       }
       return undefined; // Success
+    };
+  },
+  check (fn) {
+    return (value)=>{
+      let e = undefined;
+      try {
+        const v = fn(value);
+        if (typeof v === "boolean" && v) {
+          return undefined;
+        }
+      } catch (err) {
+        e = err;
+      }
+      if (e) {
+        if (e instanceof ParserError) {
+          return e;
+        } else {
+          return new ParserError("Failed to check type: " + e);
+        }
+      }
+      return new ParserError("Failed to check type");
     };
   }
 };
