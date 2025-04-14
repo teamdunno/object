@@ -77,8 +77,6 @@ export class SeeMaker {
   }
 }
 /** A wrapper for `(new SeeMaker()).see` with default error handling */ export const see = new SeeMaker().see;
-// export type Predicate<T> = (value: unknown) => value is T;
-// type Infer<T> = T extends Predicate<infer U> ? U : never;
 /** Type checker for objects. Dosen't provide "real" type (like Schema on Zod, Valibot, etc) */ export const typer = {
   enum: (...values)=>{
     return (val)=>{
