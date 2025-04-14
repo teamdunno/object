@@ -133,9 +133,20 @@ export const see:<T extends unknown = unknown>(value: T)=>See<T> = (new SeeMaker
 export type TyperFunc = ((val: unknown)=>ParserError | undefined)
 // export type Predicate<T> = (value: unknown) => value is T;
 // type Infer<T> = T extends Predicate<infer U> ? U : never;
-
+export interface Typer {
+  enum<T extends readonly string[]>(...values: T):TyperFunc;
+  record(keyType: TyperFunc, valueType: TyperFunc):TyperFunc;
+  tuple(...types: TyperFunc[]):TyperFunc;
+  string():TyperFunc;
+  number():TyperFunc;
+  optional(pred: TyperFunc):TyperFunc;
+  object<T extends Record<string, TyperFunc>>(shape: T):TyperFunc;
+  or(...preds: TyperFunc[]):TyperFunc;
+  and(...preds: TyperFunc[]):TyperFunc;
+  check(fn:(v:unknown)=>boolean):TyperFunc;
+}
 /** Type checker for objects. Dosen't provide "real" type (like Schema on Zod, Valibot, etc) */
-export const typer = {
+export const typer:Typer = {
   enum: <T extends readonly string[]>(...values: T):TyperFunc => {
     return ((val: unknown): ParserError | undefined => {
       if (typeof val !== "string" || !values.includes(val as T[number])) {
